@@ -15175,7 +15175,7 @@
 <p align="center">  
   <a href="https://telegra.ph/file/f03bd3b5a50f2892ec1ee.jpg">
     <img alt="secktor docs" height="300" src="https://telegra.ph/file/f03bd3b5a50f2892ec1ee.jpg">
-    <h1 align="center"> BMW BWB MADE BY IBRAHIM ADAMS</h1>
+    <h1 align="center"> QUANTUM AI MD - MADE BY BRIAN MUIGAI</h1>
   </a>
 </p>  
   
