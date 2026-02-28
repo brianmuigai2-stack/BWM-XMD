@@ -28,10 +28,16 @@ async function connectToWhatsApp() {
     }
     
     if (connection === 'close') {
-      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log('Connection closed. Reconnecting:', shouldReconnect);
+      const statusCode = lastDisconnect?.error?.output?.statusCode;
+      const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
+      console.log('Connection closed. Status:', statusCode, 'Reconnecting:', shouldReconnect);
+      
+      if (statusCode === 401) {
+        console.log('\n⚠️  Unauthorized - Need to scan QR code or add SESSION_ID\n');
+      }
+      
       if (shouldReconnect) {
-        connectToWhatsApp();
+        setTimeout(connectToWhatsApp, 5000);
       }
     } else if (connection === 'open') {
       console.log('✅ Connected to WhatsApp!');
