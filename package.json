@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name BMW-MD",
+    "start": "node start.js",
+    "start-original": "pm2 start index.js --deep-monitoring --attach --name BMW-MD",
     "stop": "pm2 stop BMW-MD",
     "restart": "pm2 restart BMW-MD",
     "session": "node session-generator.js",
