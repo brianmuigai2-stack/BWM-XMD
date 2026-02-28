@@ -3,12 +3,44 @@ import pino from 'pino';
 import qrcode from 'qrcode-terminal';
 import express from 'express';
 import fs from 'fs';
+import path from 'path';
 import config from './config.cjs';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 async function connectToWhatsApp() {
+  let authState;
+  
+  // Check if SESSION_ID is provided in environment
+  if (process.env.SESSION_ID) {
+    console.log('Using SESSION_ID from environment...');
+    
+    // Create session directory if it doesn't exist
+    if (!fs.existsSync('./session')) {
+      fs.mkdirSync('./session');
+    }
+    
+    // Parse SESSION_ID and write to creds.json
+    let sessionData = process.env.SESSION_ID;
+    
+    // Remove prefix if it exists
+    if (sessionData.startsWith('Bmw-xmdπ')) {
+      sessionData = sessionData.replace('Bmw-xmdπ', '');
+    }
+    
+    try {
+      const creds = JSON.parse(Buffer.from(sessionData, 'base64').toString('utf-8'));
+      fs.writeFileSync('./session/creds.json', JSON.stringify(creds, null, 2));
+      console.log('✅ Session credentials loaded from SESSION_ID');
+    } catch (error) {
+      console.error('❌ Error parsing SESSION_ID:', error.message);
+      console.log('Please generate a new session or check your SESSION_ID');
+      return;
+    }
+  }
+  
+  // Use file-based auth state
   const { state, saveCreds } = await useMultiFileAuthState('./session');
   
   const sock = makeWASocket({
@@ -34,6 +66,11 @@ async function connectToWhatsApp() {
       
       if (statusCode === 401) {
         console.log('\n⚠️  Unauthorized - Need to scan QR code or add SESSION_ID\n');
+      } else if (statusCode === 405) {
+        console.log('\n⚠️  Method Not Allowed - Session may be invalid or expired\n');
+        console.log('Try regenerating the session or check your connection\n');
+      } else if (statusCode === 428) {
+        console.log('\n⚠️  Connection closed - Will retry\n');
       }
       
       if (shouldReconnect) {
